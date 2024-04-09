@@ -9,4 +9,4 @@
 
 ### Resources
 
-[]()
+[Spring Authorization Server](https://docs.spring.io/spring-authorization-server/reference/overview.html)
