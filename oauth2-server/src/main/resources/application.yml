@@ -1,13 +1,13 @@
 server:
-  port: 9000
+  port: 9443
+  ssl:
+    bundle: oauth2-server
+    client-auth: want
   error:
     include-message: always
-logging:
-  level:
-    org.springframework.security: trace
 spring:
   application:
-    name: demo-app
+    name: oauth2-server
   datasource:
     url: jdbc:postgresql://localhost:5432/oauth2_demo
     username: student_admin
@@ -21,34 +21,76 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         show_sql: false
+  ssl:
+    bundle:
+      jks:
+        oauth2-server:
+          key:
+            alias: oauth2-server-poc
+            password: password
+          keystore:
+            location: classpath:keystore.p12
+            password: password
+            type: PKCS12
+#          truststore:
+#            location: classpath:keystore.p12
+#            password: password
+#            type: PKCS12
   security:
-    user:
-      name: user1
-      password: password
     oauth2:
-      authorizationserver:
-        client:
-          messaging-client:
-            registration:
-              client-id: "messaging-client"
-              client-secret: "{noop}secret"
-              client-authentication-methods:
-                - "client_secret_basic"
-              authorization-grant-types:
-                - "authorization_code"
-                - "refresh_token"
-                - "client_credentials"
-              redirect-uris:
-                - "http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc"
-                - "http://127.0.0.1:8080/authorized"
-              post-logout-redirect-uris:
-                - "http://127.0.0.1:8080/logged-out"
-              scopes:
-                - "openid"
-                - "profile"
-                - "message.read"
-                - "message.write"
-            require-authorization-consent: true
+      client:
+        registration:
+          google-idp:
+            provider: google
+            client-id: ${GOOGLE_CLIENT_ID:google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:google-client-secret}
+            scope: openid, https://www.googleapis.com/auth/userinfo.profile, https://www.googleapis.com/auth/userinfo.email
+            client-name: Sign in with Google
+          github-idp:
+            provider: github
+            client-id: ${GITHUB_CLIENT_ID:github-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:github-client-secret}
+            scope: user:email, read:user
+            client-name: Sign in with GitHub
+        provider:
+          google:
+            user-name-attribute: email
+          github:
+            user-name-attribute: login
+#    user:
+#      name: user1
+#      password: password
+#    oauth2:
+#      authorizationserver:
+#        client:
+#          messaging-client:
+#            registration:
+#              client-id: "messaging-client"saswq
+#              client-secret: "{noop}secret"
+#              client-authentication-methods:
+#                - "client_secret_basic"
+#              authorization-grant-types:
+#                - "authorization_code"
+#                - "refresh_token"
+#                - "client_credentials"
+
+#              redirect-uris:
+#                - "http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc"
+#                - "http://127.0.0.1:8080/authorized"
+#              post-logout-redirect-uris:
+#                - "http://127.0.0.1:8080/logged-out"
+#              scopes:
+#                - "openid"
+#                - "profile"
+#                - "message.read"
+#                - "message.write"
+#            require-authorization-consent: true
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO
 # Actuator
 management:
   endpoints:
