@@ -26,16 +26,16 @@ spring:
       jks:
         oauth2-server:
           key:
-            alias: oauth2-server-poc
+            alias: oauth2-server-certificate
             password: password
           keystore:
             location: classpath:keystore.p12
             password: password
             type: PKCS12
-#          truststore:
-#            location: classpath:keystore.p12
-#            password: password
-#            type: PKCS12
+          truststore:
+            location: classpath:truststore
+            password: password
+            type: PKCS12
   security:
     oauth2:
       client:
