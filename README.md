@@ -17,7 +17,7 @@ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -pass
 openssl pkcs12 -export -in cert.pem -inkey key.pem -out keystore.p12 -name oauth2-server-certificate -passin pass:changeit -passout pass:changeit
 
 # Create truststore
-keytool -import -file cert.pem -alias oauth2-server-certificate -keystore truststore
+keytool -import -noprompt -file cert.pem -alias oauth2-server-certificate -keystore truststore -storepass changeit
 
 # List keystore
 keytool -list -keystore keystore.p12

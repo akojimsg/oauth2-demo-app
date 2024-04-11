@@ -27,14 +27,14 @@ spring:
         oauth2-server:
           key:
             alias: oauth2-server-certificate
-            password: password
+            password: changeit
           keystore:
             location: classpath:keystore.p12
-            password: password
+            password: changeit
             type: PKCS12
           truststore:
             location: classpath:truststore
-            password: password
+            password: changeit
             type: PKCS12
   security:
     oauth2:

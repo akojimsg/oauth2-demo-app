@@ -81,7 +81,6 @@ public class AuthorizationServerConfig {
     DeviceClientAuthenticationProvider deviceClientAuthenticationProvider =
         new DeviceClientAuthenticationProvider(registeredClientRepository);
 
-    // @formatter:off
     http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
         .deviceAuthorizationEndpoint(deviceAuthorizationEndpoint ->
             deviceAuthorizationEndpoint.verificationUri("/activate")
@@ -97,9 +96,7 @@ public class AuthorizationServerConfig {
         .authorizationEndpoint(authorizationEndpoint ->
             authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI))
         .oidc(Customizer.withDefaults());	// Enable OpenID Connect 1.0
-    // @formatter:on
 
-    // @formatter:off
     http
         .exceptionHandling((exceptions) -> exceptions
             .defaultAuthenticationEntryPointFor(
@@ -113,7 +110,6 @@ public class AuthorizationServerConfig {
     return http.build();
   }
 
-  // @formatter:off
   @Bean
   public JdbcRegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
     RegisteredClient messagingClient = RegisteredClient.withId(UUID.randomUUID().toString())
@@ -175,7 +171,6 @@ public class AuthorizationServerConfig {
 
     return registeredClientRepository;
   }
-  // @formatter:on
 
   @Bean
   public JdbcOAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate,
@@ -214,7 +209,6 @@ public class AuthorizationServerConfig {
 
   @Bean
   public EmbeddedDatabase embeddedDatabase() {
-    // @formatter:off
     return new EmbeddedDatabaseBuilder()
         .generateUniqueName(true)
         .setType(EmbeddedDatabaseType.H2)
@@ -223,7 +217,6 @@ public class AuthorizationServerConfig {
         .addScript("org/springframework/security/oauth2/server/authorization/oauth2-authorization-consent-schema.sql")
         .addScript("org/springframework/security/oauth2/server/authorization/client/oauth2-registered-client-schema.sql")
         .build();
-    // @formatter:on
   }
 
 }
