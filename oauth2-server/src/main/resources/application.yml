@@ -10,7 +10,8 @@ spring:
     name: oauth2-server
   datasource:
     initialize: true
-    schema: schema-postgresql.sql
+    schema: classpath:schema-postgresql.sql
+    # data: classpath:data.sql
     platform: postgresql
     url: jdbc:postgresql://localhost:5432/oauth2_demo
     username: student_admin
