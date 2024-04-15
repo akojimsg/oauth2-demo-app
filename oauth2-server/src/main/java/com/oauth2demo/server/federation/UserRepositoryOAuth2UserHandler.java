@@ -1,9 +1,10 @@
 package com.oauth2demo.server.federation;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+import com.oauth2demo.server.model.repository.UserRepository;
+import com.oauth2demo.server.model.entity.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 /**
@@ -12,31 +13,17 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
  * @author Steve Riesenberg
  * @since 1.1
  */
-public final class UserRepositoryOAuth2UserHandler implements Consumer<OAuth2User> {
+@RequiredArgsConstructor
+public final class UserRepositoryOAuth2UserHandler implements Consumer<User> {
 
-  private final UserRepository userRepository = new UserRepository();
+  private final UserRepository userRepository;
 
   @Override
-  public void accept(OAuth2User user) {
+  public void accept(User user) {
     // Capture user in a local data store on first authentication
-    if (this.userRepository.findByName(user.getName()) == null) {
+    if (this.userRepository.findByUsername(user.getName()).isEmpty()) {
       System.out.println("Saving first-time user: name=" + user.getName() + ", claims=" + user.getAttributes() + ", authorities=" + user.getAuthorities());
       this.userRepository.save(user);
     }
   }
-
-  static class UserRepository {
-
-    private final Map<String, OAuth2User> userCache = new ConcurrentHashMap<>();
-
-    public OAuth2User findByName(String name) {
-      return this.userCache.get(name);
-    }
-
-    public void save(OAuth2User oauth2User) {
-      this.userCache.put(oauth2User.getName(), oauth2User);
-    }
-
-  }
-
 }

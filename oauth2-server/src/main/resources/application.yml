@@ -9,18 +9,26 @@ spring:
   application:
     name: oauth2-server
   datasource:
+    initialize: true
+    schema: schema-postgresql.sql
+    platform: postgresql
     url: jdbc:postgresql://localhost:5432/oauth2_demo
     username: student_admin
     password: $tuD3nt
-  jdbc:
+  jpa:
+    generate-ddl: true
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: create-drop
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        # dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         show_sql: false
+  sql:
+    init:
+      mode: always
   ssl:
     bundle:
       jks:
@@ -57,34 +65,6 @@ spring:
             user-name-attribute: email
           github:
             user-name-attribute: login
-#    user:
-#      name: user1
-#      password: password
-#    oauth2:
-#      authorizationserver:
-#        client:
-#          messaging-client:
-#            registration:
-#              client-id: "messaging-client"saswq
-#              client-secret: "{noop}secret"
-#              client-authentication-methods:
-#                - "client_secret_basic"
-#              authorization-grant-types:
-#                - "authorization_code"
-#                - "refresh_token"
-#                - "client_credentials"
-
-#              redirect-uris:
-#                - "http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc"
-#                - "http://127.0.0.1:8080/authorized"
-#              post-logout-redirect-uris:
-#                - "http://127.0.0.1:8080/logged-out"
-#              scopes:
-#                - "openid"
-#                - "profile"
-#                - "message.read"
-#                - "message.write"
-#            require-authorization-consent: true
 logging:
   level:
     root: INFO

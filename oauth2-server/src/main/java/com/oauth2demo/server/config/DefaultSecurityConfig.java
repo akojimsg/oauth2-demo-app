@@ -1,16 +1,22 @@
 package com.oauth2demo.server.config;
 
 import com.oauth2demo.server.federation.FederatedIdentityAuthenticationSuccessHandler;
+import com.oauth2demo.server.model.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
@@ -22,15 +28,19 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
  */
 @EnableWebSecurity
 @Configuration(proxyBeanMethods = false)
+@RequiredArgsConstructor
 public class DefaultSecurityConfig {
+  private final UserRepository userRepository;
 
-  // @formatter:off
   @Bean
   public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
     http
         .authorizeHttpRequests(authorize ->
             authorize
-                .requestMatchers("/assets/**", "/login").permitAll()
+                .requestMatchers(
+                    "/assets/**",
+                    "/login",
+                    "/actuator").permitAll()
                 .anyRequest().authenticated()
         )
         .formLogin(formLogin ->
@@ -45,23 +55,17 @@ public class DefaultSecurityConfig {
 
     return http.build();
   }
-  // @formatter:on
 
   private AuthenticationSuccessHandler authenticationSuccessHandler() {
     return new FederatedIdentityAuthenticationSuccessHandler();
   }
 
-  // @formatter:off
   @Bean
   public UserDetailsService users() {
-    UserDetails user = User.withDefaultPasswordEncoder()
-        .username("user1")
-        .password("password")
-        .roles("USER")
-        .build();
-    return new InMemoryUserDetailsManager(user);
+    return username -> userRepository
+        .findByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
   }
-  // @formatter:on
 
   @Bean
   public SessionRegistry sessionRegistry() {
@@ -73,4 +77,21 @@ public class DefaultSecurityConfig {
     return new HttpSessionEventPublisher();
   }
 
+  @Bean
+  public AuthenticationProvider authenticationProvider(){
+    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    authProvider.setUserDetailsService(users());
+    authProvider.setPasswordEncoder(passwordEncoder());
+    return authProvider;
+  }
+
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
+  }
+
+  @Bean
+  public PasswordEncoder passwordEncoder(){
+    return new BCryptPasswordEncoder();
+  }
 }

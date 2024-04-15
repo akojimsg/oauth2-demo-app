@@ -10,27 +10,23 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.oauth2demo.server.authentication.DeviceClientAuthenticationProvider;
 import com.oauth2demo.server.federation.FederatedIdentityIdTokenCustomizer;
 import com.oauth2demo.server.jose.Jwks;
+import com.oauth2demo.server.service.JdbcRegisteredClientRepository;
 import com.oauth2demo.server.web.authentication.DeviceClientAuthenticationConverter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
-import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
@@ -48,13 +44,14 @@ import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
  * @since 1.1
  */
 @Configuration(proxyBeanMethods = false)
+@RequiredArgsConstructor
 public class AuthorizationServerConfig {
   private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
 
   @Bean
   @Order(Ordered.HIGHEST_PRECEDENCE)
   public SecurityFilterChain authorizationServerSecurityFilterChain(
-      HttpSecurity http, RegisteredClientRepository registeredClientRepository,
+      HttpSecurity http, JdbcRegisteredClientRepository registeredClientRepository,
       AuthorizationServerSettings authorizationServerSettings) throws Exception {
 
     OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
@@ -106,84 +103,84 @@ public class AuthorizationServerConfig {
         )
         .oauth2ResourceServer(oauth2ResourceServer ->
             oauth2ResourceServer.jwt(Customizer.withDefaults()));
-    // @formatter:on
+
     return http.build();
   }
 
-  @Bean
-  public JdbcRegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
-    RegisteredClient messagingClient = RegisteredClient.withId(UUID.randomUUID().toString())
-        .clientId("messaging-client")
-        .clientSecret("{noop}secret")
-        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-        .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-        .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-        .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
-        .redirectUri("http://127.0.0.1:8080/authorized")
-        .postLogoutRedirectUri("http://127.0.0.1:8080/logged-out")
-        .scope(OidcScopes.OPENID)
-        .scope(OidcScopes.PROFILE)
-        .scope("message.read")
-        .scope("message.write")
-        .scope("user.read")
-        .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-        .build();
+//  @Bean
+//  public JdbcRegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
+//    RegisteredClient messagingClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//        .clientId("messaging-client")
+//        .clientSecret("{noop}secret")
+//        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//        .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//        .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+//        .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
+//        .redirectUri("http://127.0.0.1:8080/authorized")
+//        .postLogoutRedirectUri("http://127.0.0.1:8080/logged-out")
+//        .scope(OidcScopes.OPENID)
+//        .scope(OidcScopes.PROFILE)
+//        .scope("message.read")
+//        .scope("message.write")
+//        .scope("user.read")
+//        .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+//        .build();
+//
+//    RegisteredClient deviceClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//        .clientId("device-messaging-client")
+//        .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+//        .authorizationGrantType(AuthorizationGrantType.DEVICE_CODE)
+//        .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//        .scope("message.read")
+//        .scope("message.write")
+//        .build();
+//
+//    RegisteredClient tokenExchangeClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//        .clientId("token-client")
+//        .clientSecret("{noop}token")
+//        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//        .authorizationGrantType(new AuthorizationGrantType("urn:ietf:params:oauth:grant-type:token-exchange"))
+//        .scope("message.read")
+//        .build();
+//
+//    RegisteredClient mtlsDemoClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//        .clientId("mtls-demo-client")
+//        .clientAuthenticationMethod(new ClientAuthenticationMethod("tls_client_auth"))
+//        .clientAuthenticationMethod(new ClientAuthenticationMethod("self_signed_tls_client_auth"))
+//        .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+//        .scope("message.read")
+//        .scope("message.write")
+//        .clientSettings(
+//            ClientSettings.builder()
+//                //.x509CertificateSubjectDN("CN=demo-client-sample,OU=Spring Samples,O=Spring,C=US")
+//                .jwkSetUrl("http://127.0.0.1:8080/jwks")
+//                .build()
+//        )
+//        .build();
+//
+//    // Save registered client's in db as if in-memory
+//    //JdbcRegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
+//    jdbcRegisteredClientRepository.save(messagingClient);
+//    jdbcRegisteredClientRepository.save(deviceClient);
+//    jdbcRegisteredClientRepository.save(tokenExchangeClient);
+//    jdbcRegisteredClientRepository.save(mtlsDemoClient);
+//
+//    return jdbcRegisteredClientRepository;
+//  }
 
-    RegisteredClient deviceClient = RegisteredClient.withId(UUID.randomUUID().toString())
-        .clientId("device-messaging-client")
-        .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
-        .authorizationGrantType(AuthorizationGrantType.DEVICE_CODE)
-        .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-        .scope("message.read")
-        .scope("message.write")
-        .build();
-
-    RegisteredClient tokenExchangeClient = RegisteredClient.withId(UUID.randomUUID().toString())
-        .clientId("token-client")
-        .clientSecret("{noop}token")
-        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-        .authorizationGrantType(new AuthorizationGrantType("urn:ietf:params:oauth:grant-type:token-exchange"))
-        .scope("message.read")
-        .build();
-
-    RegisteredClient mtlsDemoClient = RegisteredClient.withId(UUID.randomUUID().toString())
-        .clientId("mtls-demo-client")
-        .clientAuthenticationMethod(new ClientAuthenticationMethod("tls_client_auth"))
-        .clientAuthenticationMethod(new ClientAuthenticationMethod("self_signed_tls_client_auth"))
-        .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-        .scope("message.read")
-        .scope("message.write")
-        .clientSettings(
-            ClientSettings.builder()
-                //.x509CertificateSubjectDN("CN=demo-client-sample,OU=Spring Samples,O=Spring,C=US")
-                .jwkSetUrl("http://127.0.0.1:8080/jwks")
-                .build()
-        )
-        .build();
-
-    // Save registered client's in db as if in-memory
-    JdbcRegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
-    registeredClientRepository.save(messagingClient);
-    registeredClientRepository.save(deviceClient);
-    registeredClientRepository.save(tokenExchangeClient);
-    registeredClientRepository.save(mtlsDemoClient);
-
-    return registeredClientRepository;
-  }
-
-  @Bean
-  public JdbcOAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate,
-                                                             RegisteredClientRepository registeredClientRepository) {
-    return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
-  }
-
-  @Bean
-  public JdbcOAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate,
-                                                                           RegisteredClientRepository registeredClientRepository) {
-    // Will be used by the ConsentController
-    return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
-  }
+//  @Bean
+//  public JdbcOAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate,
+//                                                             RegisteredClientRepository registeredClientRepository) {
+//    return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
+//  }
+//
+//  @Bean
+//  public JdbcOAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate,
+//                                                                           RegisteredClientRepository registeredClientRepository) {
+//    // Will be used by the ConsentController
+//    return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
+//  }
 
   @Bean
   public OAuth2TokenCustomizer<JwtEncodingContext> idTokenCustomizer() {
@@ -207,16 +204,16 @@ public class AuthorizationServerConfig {
     return AuthorizationServerSettings.builder().build();
   }
 
-  @Bean
-  public EmbeddedDatabase embeddedDatabase() {
-    return new EmbeddedDatabaseBuilder()
-        .generateUniqueName(true)
-        .setType(EmbeddedDatabaseType.H2)
-        .setScriptEncoding("UTF-8")
-        .addScript("org/springframework/security/oauth2/server/authorization/oauth2-authorization-schema.sql")
-        .addScript("org/springframework/security/oauth2/server/authorization/oauth2-authorization-consent-schema.sql")
-        .addScript("org/springframework/security/oauth2/server/authorization/client/oauth2-registered-client-schema.sql")
-        .build();
-  }
+//  @Bean
+//  public EmbeddedDatabase embeddedDatabase() {
+//    return new EmbeddedDatabaseBuilder()
+//        .generateUniqueName(true)
+//        .setType(EmbeddedDatabaseType.H2)
+//        .setScriptEncoding("UTF-8")
+//        .addScript("org/springframework/security/oauth2/server/authorization/oauth2-authorization-schema.sql")
+//        .addScript("org/springframework/security/oauth2/server/authorization/oauth2-authorization-consent-schema.sql")
+//        .addScript("org/springframework/security/oauth2/server/authorization/client/oauth2-registered-client-schema.sql")
+//        .build();
+//  }
 
 }
