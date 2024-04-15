@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Collection;
@@ -36,7 +37,7 @@ public class User implements OAuth2User, UserDetails {
   protected String password;
 
   @Column
-  @Email
+  //@Email
   //@Schema(example = "john.doe@email.com")
   protected String email;
 

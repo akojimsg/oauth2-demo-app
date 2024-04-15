@@ -7,7 +7,6 @@ import com.oauth2demo.server.model.entity.User;
 import com.oauth2demo.server.model.repository.UserRepository;
 import com.oauth2demo.server.service.JdbcRegisteredClientRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -63,7 +62,7 @@ public class OAuth2ServerApplicationConfig {
   private void initRegisteredClientRepository(){
     RegisteredClient messagingClient = RegisteredClient.withId(UUID.randomUUID().toString())
         .clientId("messaging-client")
-        .clientSecret("{noop}secret")
+        .clientSecret("{bcrypt}secret")
         .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
         .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)

@@ -10,9 +10,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.oauth2demo.server.model.entity.Authorization;
 import com.oauth2demo.server.model.repository.AuthorizationRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -50,6 +50,7 @@ public class JdbcOAuth2AuthorizationService implements OAuth2AuthorizationServic
     ClassLoader classLoader = JdbcOAuth2AuthorizationService.class.getClassLoader();
     List<Module> securityModules = SecurityJackson2Modules.getModules(classLoader);
     this.objectMapper.registerModules(securityModules);
+    this.objectMapper.registerModule(new JavaTimeModule());
     this.objectMapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
   }
 
