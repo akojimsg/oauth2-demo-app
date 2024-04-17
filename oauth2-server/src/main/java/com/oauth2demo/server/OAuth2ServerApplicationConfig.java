@@ -3,7 +3,7 @@ package com.oauth2demo.server;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.oauth2demo.server.model.entity.User;
+import com.oauth2demo.server.model.entity.UserInfo;
 import com.oauth2demo.server.model.repository.UserRepository;
 import com.oauth2demo.server.service.JdbcRegisteredClientRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -49,10 +48,10 @@ public class OAuth2ServerApplicationConfig {
       ObjectMapper mapper = new ObjectMapper();
       mapper.registerModule(new JavaTimeModule());
       mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
-      List<User> users = mapper.readValue(inputStream, new TypeReference<List<User>>() {})
+      List<UserInfo> userInfos = mapper.readValue(inputStream, new TypeReference<List<UserInfo>>() {})
           .stream()
           .peek((user) -> user.setPassword(passwordEncoder.encode("changeit$"))).collect(Collectors.toList());
-      userRepository.saveAll(users);
+      userRepository.saveAll(userInfos);
       logger.info("Initial data loaded successfully!");
     } catch (IOException e) {
       logger.error("Failed to load initial data: {0}", e);
