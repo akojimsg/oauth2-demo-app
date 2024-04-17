@@ -61,7 +61,7 @@ public class OAuth2ServerApplicationConfig {
   private void initRegisteredClientRepository(){
     RegisteredClient messagingClient = RegisteredClient.withId(UUID.randomUUID().toString())
         .clientId("messaging-client")
-        .clientSecret("{bcrypt}secret")
+        .clientSecret(passwordEncoder.encode("secret"))
         .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
         .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)

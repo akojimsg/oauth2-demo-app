@@ -7,6 +7,28 @@
 - Spring Boot
 - Spring CLI
 
+### Test Grant flow
+
+```
+# Get grant token
+
+curl --location --request GET \
+'http://localhost:9000/oauth2/authorize?response_type=code&client_id=messaging-client&scope=message.read message.write user.read&redirect_uri=http://127.0.0.1:8080/authorized' \
+--header 'Cookie: JSESSIONID=67C7723DE672D58F7478EF8047B0773A'
+```
+
+```
+# Get Auth Token
+
+curl --location --request POST 'http://localhost:9000/oauth2/token' \
+--header 'Authorization: Basic bWVzc2FnaW5nLWNsaWVudDpzZWNyZXQ=' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--header 'Cookie: JSESSIONID=67C7723DE672D58F7478EF8047B0773A' \
+--data-urlencode 'grant_type=authorization_code' \
+--data-urlencode 'code=3luC55VMTD2lw7sljiXZkPvRDmWQX0C4wBnjrdCEGr09KrraEaPKYT1ilMb728hINb_JWU9-qCF1ucvvrE2WtRXx48vuablSf3pyW_OeCq0q3ehwQhWAlg-xM7o0gHFS' \
+--data-urlencode 'redirect_uri=http://127.0.0.1:8080/authorized' | jq
+```
+
 ### Snippets
 
 ```
