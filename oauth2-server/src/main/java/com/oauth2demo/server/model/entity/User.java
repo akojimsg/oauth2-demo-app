@@ -5,15 +5,10 @@ import com.oauth2demo.server.utils.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Collection;
-import java.util.List;
 
 @Builder
 @Data
@@ -21,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "`user`")
-public class UserInfo {
+public class User {
   @Id
   @SequenceGenerator(sequenceName = "user_id_sequence", name = "user_id_sequence", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_sequence")

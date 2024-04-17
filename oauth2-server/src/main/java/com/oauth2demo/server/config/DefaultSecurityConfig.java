@@ -64,7 +64,7 @@ public class DefaultSecurityConfig {
   public UserDetailsService users() {
     return username -> userRepository
         .findByUsername(username)
-        .map(UserInfoConfig::new)
+        .map(UserDetailsManger::new)
         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
   }
 

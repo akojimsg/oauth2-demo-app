@@ -1,7 +1,7 @@
 package com.oauth2demo.server.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.oauth2demo.server.model.entity.UserInfo;
+import com.oauth2demo.server.model.entity.User;
 
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,8 +12,8 @@ import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class UserInfoConfig implements UserDetails {
-  private final UserInfo userInfo;
+public class UserDetailsManger implements UserDetails {
+  private final User userInfo;
   @Override
   @JsonIgnore
   public Collection<? extends GrantedAuthority> getAuthorities() {

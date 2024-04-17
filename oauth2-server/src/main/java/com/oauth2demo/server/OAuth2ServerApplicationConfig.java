@@ -3,7 +3,7 @@ package com.oauth2demo.server;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.oauth2demo.server.model.entity.UserInfo;
+import com.oauth2demo.server.model.entity.User;
 import com.oauth2demo.server.model.repository.UserRepository;
 import com.oauth2demo.server.service.JdbcRegisteredClientRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +48,7 @@ public class OAuth2ServerApplicationConfig {
       ObjectMapper mapper = new ObjectMapper();
       mapper.registerModule(new JavaTimeModule());
       mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
-      List<UserInfo> userInfos = mapper.readValue(inputStream, new TypeReference<List<UserInfo>>() {})
+      List<User> userInfos = mapper.readValue(inputStream, new TypeReference<List<User>>() {})
           .stream()
           .peek((user) -> user.setPassword(passwordEncoder.encode("changeit$"))).collect(Collectors.toList());
       userRepository.saveAll(userInfos);
